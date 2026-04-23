@@ -181,6 +181,7 @@
   .audit-table tr.result-row td:nth-child(2) { color: var(--teal); font-size: 0.92rem; }
   .audit-divider { height: 1px; background: var(--border); margin: 18px 0; }
   .audit-pair-header { background: var(--navy); color: white; padding: 8px 12px; border-radius: 6px; margin-bottom: 10px; font-family: 'Roboto Mono', monospace; font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+  @media print {
     header, .nav-bar, .step-pills, .btn, .data-badge { display: none !important; }
     .shell { padding: 0; max-width: 100%; }
     .card { box-shadow: none; border: 1px solid #ccc; break-inside: avoid; }
