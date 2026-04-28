@@ -781,18 +781,34 @@ function renderCalcAudit() {
   return h;
 }
 function bindEvents() {
+  // Step 1 fields — update state on input, no re-render needed (no live metrics on step 1)
   ['contactPerson','facilityName','address','city','stateAbbr','zip','preparedBy','dealership',
    'date','occupancy','totalSqFt','totalCleanable','pctMfg','pctOffice','pctCarpet','pctTile',
-   'pctConcrete','pctOther','hourlyLaborRate','weeks',
-   'machineInvestment','machineLife','leasePayment'].forEach(id => {
+   'pctConcrete','pctOther'].forEach(id => {
     const el = document.getElementById(id);
-    if (el) el.addEventListener('input', e => { state[id]=e.target.value; if(state.step===3) render(); });
+    if (el) el.addEventListener('input', e => { state[id] = e.target.value; });
   });
-  // Period and riderBonus are global parameters on step 2
+
+  // Step 3 numeric fields — update state on every keystroke (preserves cursor),
+  // but only re-render metrics on blur (when user leaves the field).
+  // This prevents the DOM rebuild that was stealing focus mid-input.
+  ['hourlyLaborRate','weeks','machineInvestment','machineLife','leasePayment'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('input', e => { state[id] = e.target.value; });
+    el.addEventListener('blur',  () => { render(); });
+  });
+
+  // Period (select) — re-render on change is fine, selects don't lose focus
   const periodEl = document.getElementById('period');
-  if (periodEl) periodEl.addEventListener('change', e => { state.period=e.target.value; render(); });
+  if (periodEl) periodEl.addEventListener('change', e => { state.period = e.target.value; render(); });
+
+  // Rider bonus (number input on step 2) — same pattern: state on input, render on blur
   const riderEl = document.getElementById('riderBonus');
-  if (riderEl && riderEl.type === 'number') riderEl.addEventListener('input', e => { state.riderBonus=parseInt(e.target.value)||0; render(); });
+  if (riderEl && riderEl.type === 'number') {
+    riderEl.addEventListener('input', e => { state.riderBonus = parseInt(e.target.value) || 0; });
+    riderEl.addEventListener('blur',  () => { render(); });
+  }
 
   document.querySelectorAll('.task-input').forEach(el => {
     el.addEventListener('input', e => {
